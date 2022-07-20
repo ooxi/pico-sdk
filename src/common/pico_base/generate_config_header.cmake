@@ -25,5 +25,5 @@ file(GENERATE
 configure_file( ${CMAKE_CURRENT_LIST_DIR}/include/pico/version.h.in ${CMAKE_BINARY_DIR}/generated/pico_base/pico/version.h)
 
 foreach(DIR IN LISTS PICO_INCLUDE_DIRS)
-    target_include_directories(pico_base_headers INTERFACE ${DIR})
+    target_include_directories(pico_base_headers SYSTEM INTERFACE ${DIR})
 endforeach()
