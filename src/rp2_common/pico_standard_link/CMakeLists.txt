@@ -94,4 +94,19 @@ if (NOT TARGET pico_standard_link)
         target_compile_options(pico_standard_link INTERFACE -ffunction-sections -fdata-sections)
         target_link_options(pico_standard_link INTERFACE "LINKER:--gc-sections")
     endif()
+
+    # Ignore warnings about rwx segments introduced in binutils 2.39
+    execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-prog-name=ld RESULT_VARIABLE RUN_CXX_RESULT OUTPUT_VARIABLE FULL_LD_PATH
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (${RUN_CXX_RESULT} EQUAL 0)
+        execute_process(COMMAND ${FULL_LD_PATH} -v RESULT_VARIABLE RUN_LD_RESULT OUTPUT_VARIABLE FULL_LD_VERSION
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+        if (${RUN_LD_RESULT} EQUAL 0)
+                string(REGEX MATCH "[0-9]+\\.[0-9]+(\\.[0-9]+)?" BIN_UTILS_VERSION "${FULL_LD_VERSION}")
+                if ("${BIN_UTILS_VERSION}" VERSION_GREATER_EQUAL 2.39)
+                    target_link_options(pico_standard_link INTERFACE "LINKER:--no-warn-rwx-segments")
+                endif()
+        endif()
+    endif()
+
 endif()
